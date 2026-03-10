@@ -22,7 +22,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # full history required for changelog generation
+          fetch-depth: 0
+          # PAT required so that PRs/tags created by release-plz trigger CI workflows.
+          # GITHUB_TOKEN-created events are explicitly blocked from triggering further runs.
+          persist-credentials: true
+          token: ${{ secrets.RELEASE_PLZ_TOKEN }}
 
       - name: Install stable toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -37,7 +41,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Run release-plz
-        uses: MarcoIeni/release-plz-action@v0.5
+        uses: release-plz/action@v0.5
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
