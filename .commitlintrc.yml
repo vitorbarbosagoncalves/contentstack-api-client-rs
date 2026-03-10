@@ -1,0 +1,42 @@
+extends:
+  - "@commitlint/config-conventional"
+
+rules:
+  # Types allowed - maps directly to release-plz changelog sections
+  type-enum:
+    - 2      # error
+    - always
+    - - feat      # minor bump
+      - fix       # patch bump
+      - perf      # patch bump
+      - refactor  # no bump (but included in changelog)
+      - docs      # no bump
+      - chore     # no bump (release-plz uses this for its own PRs)
+      - ci        # no bump
+      - test      # no bump
+      - build     # no bump
+      - revert    # no bump
+
+  # Enforce non-empty subject
+  subject-empty:
+    - 2
+    - never
+
+  # No period at end of subject line
+  subject-full-stop:
+    - 2
+    - never
+    - "."
+
+  # Subject line in lowercase
+  subject-case:
+    - 2
+    - always
+    - - lower-case
+      - sentence-case  # allow "OAuth" etc.
+
+  # Max subject line length (GitHub shows ~72 chars)
+  header-max-length:
+    - 2
+    - always
+    - 72
