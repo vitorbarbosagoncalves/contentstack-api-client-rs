@@ -80,7 +80,7 @@ use std::time::Duration;
 let client = Delivery::new(
     "YOUR_API_KEY",
     "YOUR_DELIVERY_TOKEN",
-    "production",
+    "live",
     Some(ClientOptions {
         region: Some(Region::AwsEu),       // default: AwsNa
         timeout: Some(Duration::from_secs(10)), // default: 30s
