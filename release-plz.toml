@@ -1,0 +1,15 @@
+[workspace]
+# Automatically update Cargo.toml version and CHANGELOG.md
+changelog_update = true
+
+# Create a GitHub release on every publish
+git_release_enable = true
+
+# Publish to crates.io when the release PR is merged
+publish = true
+
+# Use Conventional Commits to determine the version bump
+# feat: -> minor, fix: -> patch, feat!:/BREAKING CHANGE: -> major
+[[package]]
+name = "contentstack-api-client-rs"
+changelog_include = ["feat", "fix", "perf", "refactor", "docs"]
