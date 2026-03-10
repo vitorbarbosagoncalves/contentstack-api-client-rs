@@ -1,8 +1,8 @@
 pub mod entries;
 
 use reqwest::{
-    header::{HeaderMap, HeaderValue},
     Client,
+    header::{HeaderMap, HeaderValue},
 };
 
 use crate::client::{

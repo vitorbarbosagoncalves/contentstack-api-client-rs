@@ -150,7 +150,7 @@ impl<'a> Entries<'a> {
     fn build_url(content_type: &str, uid: Option<&str>) -> String {
         match uid {
             Some(u) => format!("/content_types/{}/entries/{}", content_type, u),
-            None    => format!("/content_types/{}/entries", content_type),
+            None => format!("/content_types/{}/entries", content_type),
         }
     }
 
