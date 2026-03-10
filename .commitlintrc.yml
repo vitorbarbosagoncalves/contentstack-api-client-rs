@@ -28,12 +28,11 @@ rules:
     - never
     - "."
 
-  # Subject line in lowercase
+  # Subject line must be lowercase (e.g. "add streaming support", not "Add streaming support")
   subject-case:
     - 2
     - always
     - - lower-case
-      - sentence-case  # allow "OAuth" etc.
 
   # Max subject line length (GitHub shows ~72 chars)
   header-max-length:
