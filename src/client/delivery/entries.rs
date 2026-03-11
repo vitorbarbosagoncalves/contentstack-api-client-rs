@@ -1,10 +1,10 @@
-use std::{collections::HashMap, sync::Arc};
+use std::collections::HashMap;
 
-use reqwest::Client;
+use reqwest_middleware::ClientWithMiddleware;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::rate_limiter::ClientRateLimiter;
+use crate::error::Result;
 
 /// A JSON query filter map - keys are field UIDs, values are match conditions.
 ///
@@ -144,8 +144,7 @@ pub struct EntryResponse<T> {
 ///
 /// Obtained via [`crate::Delivery::entries`] - never constructed directly.
 pub struct Entries<'a> {
-    pub client: &'a Client,
-    pub rate_limiter: &'a Arc<ClientRateLimiter>,
+    pub(super) client: &'a ClientWithMiddleware,
 }
 
 impl<'a> Entries<'a> {
@@ -173,7 +172,7 @@ impl<'a> Entries<'a> {
     /// #[derive(Deserialize)]
     /// struct BlogPost { body: String }
     ///
-    /// # async fn example() -> Result<(), reqwest::Error> {
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
     /// let client = Delivery::new("api_key", "token", "production", None);
     /// let response = client.entries()
     ///     .get_many::<BlogPost>("blog_post", None)
@@ -187,7 +186,7 @@ impl<'a> Entries<'a> {
         &self,
         content_type: &str,
         params: Option<GetManyParams<'_>>,
-    ) -> Result<EntriesResponse<T>, reqwest::Error>
+    ) -> Result<EntriesResponse<T>>
     where
         T: for<'de> Deserialize<'de>,
     {
@@ -200,9 +199,7 @@ impl<'a> Entries<'a> {
             request
         };
 
-        // TODO: implement a middleware and move rate limit calls there
-        self.rate_limiter.until_ready().await;
-        request.send().await?.json::<EntriesResponse<T>>().await
+        Ok(request.send().await?.json::<EntriesResponse<T>>().await?)
     }
 
     /// Fetches a single entry by UID for a given content type.
@@ -222,7 +219,7 @@ impl<'a> Entries<'a> {
     /// #[derive(Deserialize)]
     /// struct BlogPost { body: String }
     ///
-    /// # async fn example() -> Result<(), reqwest::Error> {
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
     /// let client = Delivery::new("api_key", "token", "production", None);
     /// let response = client.entries()
     ///     .get_one::<BlogPost>("blog_post", "entry_uid_123", None)
@@ -237,7 +234,7 @@ impl<'a> Entries<'a> {
         content_type: &str,
         uid: &str,
         params: Option<GetOneParams<'_>>,
-    ) -> Result<EntryResponse<T>, reqwest::Error>
+    ) -> Result<EntryResponse<T>>
     where
         T: for<'de> Deserialize<'de>,
     {
@@ -250,8 +247,6 @@ impl<'a> Entries<'a> {
             request
         };
 
-        // TODO: implement a middleware and move rate limit calls there
-        self.rate_limiter.until_ready().await;
-        request.send().await?.json::<EntryResponse<T>>().await
+        Ok(request.send().await?.json::<EntryResponse<T>>().await?)
     }
 }

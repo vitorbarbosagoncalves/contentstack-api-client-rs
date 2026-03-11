@@ -1,5 +1,6 @@
 pub mod client;
 pub mod error;
+pub(crate) mod middleware;
 pub mod rate_limiter;
 
 pub use client::Delivery;
