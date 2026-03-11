@@ -1,17 +1,17 @@
 pub mod entries;
 
-use std::sync::Arc;
-
 use reqwest::{
     Client,
     header::{HeaderMap, HeaderValue},
 };
+use reqwest_middleware::{ClientBuilder, ClientWithMiddleware};
 
 use crate::{
     client::{
         config::{ClientConfig, ClientOptions},
         delivery::entries::Entries,
     },
+    middleware::rate_limiter::RateLimiterMiddleware,
     rate_limiter::{ClientRateLimiter, RateLimitPreset},
 };
 
@@ -21,8 +21,7 @@ use crate::{
 /// on every request automatically.
 pub struct Delivery {
     pub config: ClientConfig,
-    pub client: Client,
-    rate_limiter: Arc<ClientRateLimiter>,
+    pub client: ClientWithMiddleware,
 }
 
 impl Delivery {
@@ -70,25 +69,25 @@ impl Delivery {
             );
         }
 
-        let client = Client::builder()
+        let reqwest_client = Client::builder()
             .default_headers(headers)
             .timeout(config.timeout)
             .pool_max_idle_per_host(config.max_connections)
             .build()
             .expect("Failed to build HTTP client");
 
-        let rate_limiter = ClientRateLimiter::new(RateLimitPreset::Delivery);
-        Self {
-            config,
-            client,
-            rate_limiter,
-        }
+        let client = ClientBuilder::new(reqwest_client)
+            .with(RateLimiterMiddleware {
+                rate_limiter: ClientRateLimiter::new(RateLimitPreset::Delivery),
+            })
+            .build();
+
+        Self { config, client }
     }
 
     pub fn entries(&self) -> Entries<'_> {
         Entries {
             client: &self.client,
-            rate_limiter: &self.rate_limiter,
         }
     }
 }
