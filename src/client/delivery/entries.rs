@@ -1,8 +1,10 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+
+use crate::rate_limiter::ClientRateLimiter;
 
 /// A JSON query filter map - keys are field UIDs, values are match conditions.
 ///
@@ -143,6 +145,7 @@ pub struct EntryResponse<T> {
 /// Obtained via [`crate::Delivery::entries`] - never constructed directly.
 pub struct Entries<'a> {
     pub client: &'a Client,
+    pub rate_limiter: &'a Arc<ClientRateLimiter>,
 }
 
 impl<'a> Entries<'a> {
@@ -197,6 +200,8 @@ impl<'a> Entries<'a> {
             request
         };
 
+        // TODO: implement a middleware and move rate limit calls there
+        self.rate_limiter.until_ready().await;
         request.send().await?.json::<EntriesResponse<T>>().await
     }
 
@@ -245,6 +250,8 @@ impl<'a> Entries<'a> {
             request
         };
 
+        // TODO: implement a middleware and move rate limit calls there
+        self.rate_limiter.until_ready().await;
         request.send().await?.json::<EntryResponse<T>>().await
     }
 }

@@ -1,13 +1,18 @@
 pub mod entries;
 
+use std::sync::Arc;
+
 use reqwest::{
     Client,
     header::{HeaderMap, HeaderValue},
 };
 
-use crate::client::{
-    config::{ClientConfig, ClientOptions},
-    delivery::entries::Entries,
+use crate::{
+    client::{
+        config::{ClientConfig, ClientOptions},
+        delivery::entries::Entries,
+    },
+    rate_limiter::{ClientRateLimiter, RateLimitPreset},
 };
 
 /// Async HTTP client for the Contentstack Content Delivery API (CDN).
@@ -17,6 +22,7 @@ use crate::client::{
 pub struct Delivery {
     pub config: ClientConfig,
     pub client: Client,
+    rate_limiter: Arc<ClientRateLimiter>,
 }
 
 impl Delivery {
@@ -71,12 +77,18 @@ impl Delivery {
             .build()
             .expect("Failed to build HTTP client");
 
-        Self { config, client }
+        let rate_limiter = ClientRateLimiter::new(RateLimitPreset::Delivery);
+        Self {
+            config,
+            client,
+            rate_limiter,
+        }
     }
 
     pub fn entries(&self) -> Entries<'_> {
         Entries {
             client: &self.client,
+            rate_limiter: &self.rate_limiter,
         }
     }
 }
