@@ -89,6 +89,43 @@ impl ClientConfig {
             region: Option::expect(defaults.region, "Region not provided"),
         }
     }
+
+    /// Builds a [`ClientConfig`] for the Management API.
+    ///
+    /// Defaults to AWS NA region (`https://api.contentstack.io`) if no
+    /// `base_url` or `region` override is provided. Management API requests
+    /// do not use an environment, so that field is left empty.
+    ///
+    /// # Arguments
+    ///
+    /// * `api_key` - Your stack's API key
+    /// * `management_token` - Stack management token
+    /// * `opts` - Optional configuration overrides (region, timeout, max connections)
+    pub fn management(api_key: &str, management_token: &str, opts: Option<ClientOptions>) -> Self {
+        let defaults = ClientOptions::get_defaults(ClientType::Management);
+
+        let defaults = if let Some(config) = opts {
+            ClientOptions {
+                base_url: config.base_url.or(defaults.base_url),
+                timeout: config.timeout.or(defaults.timeout),
+                max_connections: config.max_connections.or(defaults.max_connections),
+                region: config.region.or(defaults.region),
+            }
+        } else {
+            defaults
+        };
+
+        Self {
+            base_url: Option::expect(defaults.base_url, "Base Url not provided"),
+            api_key: api_key.into(),
+            delivery_token: String::new(),
+            management_token: management_token.into(),
+            environment: None,
+            timeout: defaults.timeout.unwrap_or(Duration::from_secs(30)),
+            max_connections: defaults.max_connections.unwrap_or(50),
+            region: Option::expect(defaults.region, "Region not provided"),
+        }
+    }
 }
 
 impl ClientOptions {
