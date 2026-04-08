@@ -88,6 +88,7 @@ impl Delivery {
     pub fn entries(&self) -> Entries<'_> {
         Entries {
             client: &self.client,
+            base_url: &self.config.base_url,
         }
     }
 }

@@ -145,14 +145,16 @@ pub struct EntryResponse<T> {
 /// Obtained via [`crate::Delivery::entries`] - never constructed directly.
 pub struct Entries<'a> {
     pub(super) client: &'a ClientWithMiddleware,
+    pub(super) base_url: &'a str,
 }
 
 impl<'a> Entries<'a> {
     /// Builds the entries URL for a given content type, with an optional entry UID.
-    fn build_url(content_type: &str, uid: Option<&str>) -> String {
+    fn build_url(&self, content_type: &str, uid: Option<&str>) -> String {
+        let base_url = self.base_url.trim_end_matches('/');
         match uid {
-            Some(u) => format!("/content_types/{}/entries/{}", content_type, u),
-            None => format!("/content_types/{}/entries", content_type),
+            Some(u) => format!("{}/content_types/{}/entries/{}", base_url, content_type, u),
+            None => format!("{}/content_types/{}/entries", base_url, content_type),
         }
     }
 
@@ -190,7 +192,7 @@ impl<'a> Entries<'a> {
     where
         T: for<'de> Deserialize<'de>,
     {
-        let request = self.client.get(Entries::build_url(content_type, None));
+        let request = self.client.get(self.build_url(content_type, None));
 
         let request = if let Some(p) = params {
             let serialized: SerializedGetManyParams = p.into();
@@ -238,7 +240,7 @@ impl<'a> Entries<'a> {
     where
         T: for<'de> Deserialize<'de>,
     {
-        let request = self.client.get(Entries::build_url(content_type, Some(uid)));
+        let request = self.client.get(self.build_url(content_type, Some(uid)));
 
         let request = if let Some(p) = params {
             let serialized: SerializedGetOneParams = p.into();
