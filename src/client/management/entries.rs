@@ -2,7 +2,9 @@ use reqwest_middleware::ClientWithMiddleware;
 use serde::Deserialize;
 
 use crate::client::entries::{EntriesResponse, EntryResponse};
-use crate::client::params::{GetManyParams, GetOneParams, SerializedGetManyParams, SerializedGetOneParams};
+use crate::client::params::{
+    GetManyParams, GetOneParams, SerializedGetManyParams, SerializedGetOneParams,
+};
 use crate::error::Result;
 
 pub struct Entries<'a> {

@@ -5,5 +5,7 @@ pub mod rate_limiter;
 
 pub use client::config::{ClientOptions, Region};
 pub use client::{Delivery, Management};
-pub use client::{Entries, EntriesResponse, Entry, EntryResponse, GetManyParams, GetOneParams, Query};
+pub use client::{
+    Entries, EntriesResponse, Entry, EntryResponse, GetManyParams, GetOneParams, Query,
+};
 pub use error::ClientError;
