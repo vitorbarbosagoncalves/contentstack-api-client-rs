@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0](https://github.com/vitorbarbosagoncalves/contentstack-api-client-rs/compare/v0.2.0...v0.3.0) - 2026-04-09
+
+### Added
+
+- *(params)* add derive traits and missing query fields ([#22](https://github.com/vitorbarbosagoncalves/contentstack-api-client-rs/pull/22))
+- *(client)* make clients cloneable and improve configuration docs ([#20](https://github.com/vitorbarbosagoncalves/contentstack-api-client-rs/pull/20))
+
 ## [0.2.0](https://github.com/vitorbarbosagoncalves/contentstack-api-client-rs/compare/v0.1.1...v0.2.0) - 2026-04-08
 
 ### Added
