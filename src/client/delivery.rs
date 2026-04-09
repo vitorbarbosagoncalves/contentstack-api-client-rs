@@ -19,6 +19,7 @@ use crate::{
 ///
 /// Holds a connection pool and injects the required authentication headers
 /// on every request automatically.
+#[derive(Clone, Debug)]
 pub struct Delivery {
     pub config: ClientConfig,
     pub client: ClientWithMiddleware,
