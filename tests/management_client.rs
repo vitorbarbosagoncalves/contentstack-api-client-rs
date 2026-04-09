@@ -118,3 +118,15 @@ async fn test_get_many_entries() {
     assert_eq!(response.entries[1].fields.body, "Second body");
     assert_eq!(response.count, Some(2));
 }
+
+#[tokio::test]
+async fn test_client_cloning() {
+    let client = Management::new("test_api_key", "test_management_token", None);
+    let cloned_client = client.clone();
+
+    assert_eq!(client.config.api_key, cloned_client.config.api_key);
+    assert_eq!(
+        client.config.management_token,
+        cloned_client.config.management_token
+    );
+}

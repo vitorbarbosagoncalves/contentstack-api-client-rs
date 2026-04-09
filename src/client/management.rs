@@ -25,6 +25,7 @@ use entries::Entries;
 ///
 /// let client = Management::new("my_api_key", "my_management_token", None);
 /// ```
+#[derive(Clone, Debug)]
 pub struct Management {
     pub config: ClientConfig,
     pub client: ClientWithMiddleware,

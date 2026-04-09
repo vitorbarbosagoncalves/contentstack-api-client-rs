@@ -63,3 +63,15 @@ async fn test_get_one_entry() {
     assert_eq!(response.entry.title, "Hello Rust");
     assert_eq!(response.entry.fields.body, "This is a test post");
 }
+
+#[tokio::test]
+async fn test_client_cloning() {
+    let client = Delivery::new("test_api_key", "test_token", "test_env", None);
+    let cloned_client = client.clone();
+
+    assert_eq!(client.config.api_key, cloned_client.config.api_key);
+    assert_eq!(
+        client.config.delivery_token,
+        cloned_client.config.delivery_token
+    );
+}
