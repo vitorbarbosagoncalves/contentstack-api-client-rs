@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2](https://github.com/vitorbarbosagoncalves/contentstack-api-client-rs/compare/v0.5.1...v0.5.2) - 2026-04-13
+
+### Added
+
+- *(environments)* add get_many method to Environments sub-client ([#29](https://github.com/vitorbarbosagoncalves/contentstack-api-client-rs/pull/29))
+
 ## [0.5.1](https://github.com/vitorbarbosagoncalves/contentstack-api-client-rs/compare/v0.5.0...v0.5.1) - 2026-04-13
 
 ### Added
