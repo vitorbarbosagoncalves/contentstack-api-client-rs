@@ -1,12 +1,15 @@
 use reqwest_middleware::ClientWithMiddleware;
-use serde::Deserialize;
+use serde::de::DeserializeOwned;
 
-use crate::client::entries::{EntriesResponse, EntryResponse};
+use crate::client::entries::{EntriesGetter, EntriesResponse, EntryResponse};
 use crate::client::params::{
     GetManyParams, GetOneParams, SerializedGetManyParams, SerializedGetOneParams,
 };
 use crate::error::Result;
 
+/// Sub-client for the Entries endpoint (Management API).
+///
+/// Obtained via [`crate::Management::entries`] — never constructed directly.
 pub struct Entries<'a> {
     pub(super) client: &'a ClientWithMiddleware,
     pub(super) base_url: &'a str,
@@ -20,15 +23,14 @@ impl<'a> Entries<'a> {
             None => format!("{}/content_types/{}/entries", base_url, content_type),
         }
     }
+}
 
-    pub async fn get_many<T>(
+impl<'a> EntriesGetter for Entries<'a> {
+    async fn get_many<T: DeserializeOwned>(
         &self,
         content_type: &str,
         params: Option<GetManyParams>,
-    ) -> Result<EntriesResponse<T>>
-    where
-        T: for<'de> Deserialize<'de>,
-    {
+    ) -> Result<EntriesResponse<T>> {
         let request = self.client.get(self.build_url(content_type, None));
 
         let request = if let Some(p) = params {
@@ -41,15 +43,12 @@ impl<'a> Entries<'a> {
         Ok(request.send().await?.json::<EntriesResponse<T>>().await?)
     }
 
-    pub async fn get_one<T>(
+    async fn get_one<T: DeserializeOwned>(
         &self,
         content_type: &str,
         uid: &str,
         params: Option<GetOneParams>,
-    ) -> Result<EntryResponse<T>>
-    where
-        T: for<'de> Deserialize<'de>,
-    {
+    ) -> Result<EntryResponse<T>> {
         let request = self.client.get(self.build_url(content_type, Some(uid)));
 
         let request = if let Some(p) = params {

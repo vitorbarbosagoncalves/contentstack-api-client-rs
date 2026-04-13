@@ -1,4 +1,4 @@
-use contentstack_api_client_rs::{ClientOptions, Management};
+use contentstack_api_client_rs::{ClientOptions, EntriesGetter, Management};
 use serde::Deserialize;
 use serde_json::json;
 use std::time::Duration;

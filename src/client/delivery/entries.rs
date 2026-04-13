@@ -1,7 +1,7 @@
 use reqwest_middleware::ClientWithMiddleware;
-use serde::Deserialize;
+use serde::de::DeserializeOwned;
 
-use crate::client::entries::{EntriesResponse, EntryResponse};
+use crate::client::entries::{EntriesGetter, EntriesResponse, EntryResponse};
 use crate::client::params::{
     GetManyParams, GetOneParams, SerializedGetManyParams, SerializedGetOneParams,
 };
@@ -18,7 +18,6 @@ pub struct Entries<'a> {
 }
 
 impl<'a> Entries<'a> {
-    /// Builds the entries URL for a given content type, with an optional entry UID.
     fn build_url(&self, content_type: &str, uid: Option<&str>) -> String {
         let base_url = self.base_url.trim_end_matches('/');
         match uid {
@@ -26,7 +25,9 @@ impl<'a> Entries<'a> {
             None => format!("{}/content_types/{}/entries", base_url, content_type),
         }
     }
+}
 
+impl<'a> EntriesGetter for Entries<'a> {
     /// Fetches multiple entries for a given content type.
     ///
     /// # Arguments
@@ -38,7 +39,7 @@ impl<'a> Entries<'a> {
     ///
     /// ```no_run
     /// use serde::Deserialize;
-    /// use contentstack_api_client_rs::{Delivery, GetManyParams};
+    /// use contentstack_api_client_rs::{Delivery, EntriesGetter, GetManyParams};
     ///
     /// #[derive(Deserialize)]
     /// struct BlogPost { body: String }
@@ -53,14 +54,11 @@ impl<'a> Entries<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn get_many<T>(
+    async fn get_many<T: DeserializeOwned>(
         &self,
         content_type: &str,
         params: Option<GetManyParams>,
-    ) -> Result<EntriesResponse<T>>
-    where
-        T: for<'de> Deserialize<'de>,
-    {
+    ) -> Result<EntriesResponse<T>> {
         let request = self.client.get(self.build_url(content_type, None));
 
         let request = if let Some(p) = params {
@@ -85,7 +83,7 @@ impl<'a> Entries<'a> {
     ///
     /// ```no_run
     /// use serde::Deserialize;
-    /// use contentstack_api_client_rs::{Delivery, GetOneParams};
+    /// use contentstack_api_client_rs::{Delivery, EntriesGetter, GetOneParams};
     ///
     /// #[derive(Deserialize)]
     /// struct BlogPost { body: String }
@@ -100,15 +98,12 @@ impl<'a> Entries<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn get_one<T>(
+    async fn get_one<T: DeserializeOwned>(
         &self,
         content_type: &str,
         uid: &str,
         params: Option<GetOneParams>,
-    ) -> Result<EntryResponse<T>>
-    where
-        T: for<'de> Deserialize<'de>,
-    {
+    ) -> Result<EntryResponse<T>> {
         let request = self.client.get(self.build_url(content_type, Some(uid)));
 
         let request = if let Some(p) = params {
