@@ -58,6 +58,80 @@ async fn test_get_one_entry() {
 }
 
 #[tokio::test]
+async fn test_get_one_entry_with_publish_details() {
+    use contentstack_api_client_rs::{GetOneParams, client::entries::PublishDetails};
+
+    let mock_server = MockServer::start().await;
+
+    let response_body = json!({
+        "entry": {
+            "uid": "entry_456",
+            "title": "Management Entry",
+            "locale": "en-us",
+            "created_at": "2024-01-01T00:00:00.000Z",
+            "updated_at": "2024-01-01T00:00:00.000Z",
+            "created_by": "user1",
+            "updated_by": "user1",
+            "_version": 2,
+            "publish_details": [
+                {
+                    "environment": "production",
+                    "locale": "en-us",
+                    "time": "2024-01-01T12:00:00.000Z",
+                    "user": "user1"
+                },
+                {
+                    "environment": "staging",
+                    "locale": "en-us",
+                    "time": "2024-01-02T12:00:00.000Z",
+                    "user": "user1"
+                }
+            ],
+            "body": "Written via management API"
+        }
+    });
+
+    Mock::given(method("GET"))
+        .and(path("/content_types/blog_post/entries/entry_456"))
+        .and(wiremock::matchers::query_param(
+            "include_publish_details",
+            "true",
+        ))
+        .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
+        .mount(&mock_server)
+        .await;
+
+    let client_opts = ClientOptions {
+        base_url: Some(mock_server.uri()),
+        timeout: Some(Duration::from_secs(1)),
+        max_connections: Some(10),
+        region: None,
+    };
+
+    let client = Management::new("test_api_key", "test_management_token", Some(client_opts));
+
+    let params = GetOneParams {
+        include_publish_details: Some(true),
+        ..Default::default()
+    };
+
+    let response = client
+        .entries()
+        .get_one::<BlogPost>("blog_post", "entry_456", Some(params))
+        .await
+        .expect("Failed to fetch entry");
+
+    match response.entry.publish_details {
+        Some(PublishDetails::Multiple(details)) => {
+            assert_eq!(details.len(), 2);
+            assert_eq!(details[0].environment, "production");
+            assert_eq!(details[1].environment, "staging");
+        }
+        _ => panic!("Expected Multiple publish_details"),
+    }
+}
+
+#[tokio::test]
 async fn test_get_many_entries() {
     let mock_server = MockServer::start().await;
 

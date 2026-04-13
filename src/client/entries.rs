@@ -36,9 +36,39 @@ pub struct Entry<T> {
     pub updated_by: String,
     #[serde(rename = "_version")]
     pub version: u32,
+    /// Details about when and where the entry was published.
+    /// Only present if `include_publish_details: true` was passed in params.
+    pub publish_details: Option<PublishDetails>,
     /// Caller's custom fields - flattened into the same JSON object.
     #[serde(flatten)]
     pub fields: T,
+}
+
+/// Information about the publication state of an entry.
+///
+/// The Contentstack Delivery API returns a single object, while the
+/// Management API returns a list of objects. This enum handles both cases
+/// transparently during deserialization.
+#[derive(Debug, Deserialize, Clone)]
+#[serde(untagged)]
+pub enum PublishDetails {
+    /// A single publication record (standard for Delivery API).
+    Single(PublishDetail),
+    /// Multiple publication records (standard for Management API).
+    Multiple(Vec<PublishDetail>),
+}
+
+/// A single publication record detailing the environment and locale.
+#[derive(Debug, Deserialize, Clone)]
+pub struct PublishDetail {
+    /// The environment UID where the entry is published.
+    pub environment: String,
+    /// The locale code (e.g., "en-us") of the published version.
+    pub locale: String,
+    /// ISO 8601 timestamp of the publication.
+    pub time: String,
+    /// The user UID who performed the publication.
+    pub user: String,
 }
 
 /// Response wrapper for a list of entries.
