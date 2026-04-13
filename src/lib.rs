@@ -7,7 +7,7 @@ pub use client::config::{ClientOptions, ClientType, Region};
 pub use client::{Delivery, Management};
 pub use client::{
     Entries, EntriesGetter, EntriesResponse, Entry, EntryResponse, Environment,
-    EnvironmentResponse, GetManyParams, GetOneParams, Query,
+    EnvironmentResponse, EnvironmentsResponse, GetManyParams, GetOneParams, Query,
 };
 
 pub use error::ClientError;

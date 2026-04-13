@@ -51,3 +51,27 @@ pub struct Environment {
 pub struct EnvironmentResponse {
     pub environment: Environment,
 }
+
+/// Response wrapper for a list of environments.
+///
+/// Contentstack returns `{ "environments": [...], "count": N }`.
+///
+/// # Example
+///
+/// ```
+/// use contentstack_api_client_rs::{Environment, EnvironmentsResponse};
+///
+/// let json = r#"{
+///     "environments": [
+///         { "uid": "env_1", "name": "production" }
+///     ],
+///     "count": 1
+/// }"#;
+/// let response: EnvironmentsResponse = serde_json::from_str(json).unwrap();
+/// assert_eq!(response.environments.len(), 1);
+/// ```
+#[derive(Debug, Deserialize)]
+pub struct EnvironmentsResponse {
+    pub environments: Vec<Environment>,
+    pub count: Option<u32>,
+}
