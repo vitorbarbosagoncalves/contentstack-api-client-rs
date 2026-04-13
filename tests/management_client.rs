@@ -232,7 +232,10 @@ async fn test_get_environment() {
 
     assert_eq!(response.environment.uid, "env_123");
     assert_eq!(response.environment.name, "production");
-    assert_eq!(response.environment.description.unwrap(), "Production environment");
+    assert_eq!(
+        response.environment.description.unwrap(),
+        "Production environment"
+    );
 }
 
 #[tokio::test]

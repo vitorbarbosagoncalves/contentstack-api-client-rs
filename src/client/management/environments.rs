@@ -1,6 +1,6 @@
-use reqwest_middleware::ClientWithMiddleware;
 use crate::client::environments::EnvironmentResponse;
 use crate::error::Result;
+use reqwest_middleware::ClientWithMiddleware;
 
 /// Sub-client for the Environments endpoint (Management API).
 ///

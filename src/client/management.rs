@@ -91,6 +91,18 @@ impl Management {
     }
 
     /// Returns an [`Environments`] sub-client for managing environments.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use contentstack_api_client_rs::Management;
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = Management::new("api_key", "token", None);
+    /// let response = client.environments().get("production_uid").await?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn environments(&self) -> Environments<'_> {
         Environments {
             client: &self.client,
