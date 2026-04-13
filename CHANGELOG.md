@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0](https://github.com/vitorbarbosagoncalves/contentstack-api-client-rs/compare/v0.3.0...v0.4.0) - 2026-04-13
+
+### Other
+
+- [**breaking**] unify entry fetching under EntriesGetter trait ([#23](https://github.com/vitorbarbosagoncalves/contentstack-api-client-rs/pull/23))
+
 ## [0.3.0](https://github.com/vitorbarbosagoncalves/contentstack-api-client-rs/compare/v0.2.0...v0.3.0) - 2026-04-09
 
 ### Added
