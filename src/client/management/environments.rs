@@ -29,12 +29,12 @@ impl<'a> Environments<'a> {
     ///
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
     /// let client = Management::new("my_api_key", "my_token", None);
-    /// let response = client.environments().get("production_uid").await?;
+    /// let response = client.environments().get_one("production_uid").await?;
     /// println!("Name: {}", response.environment.name);
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn get(&self, uid: &str) -> Result<EnvironmentResponse> {
+    pub async fn get_one(&self, uid: &str) -> Result<EnvironmentResponse> {
         let request = self.client.get(self.build_url(uid));
         Ok(request.send().await?.json::<EnvironmentResponse>().await?)
     }

@@ -226,7 +226,7 @@ async fn test_get_environment() {
 
     let response = client
         .environments()
-        .get("env_123")
+        .get_one("env_123")
         .await
         .expect("Failed to fetch environment");
 

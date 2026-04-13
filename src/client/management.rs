@@ -99,7 +99,7 @@ impl Management {
     ///
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
     /// let client = Management::new("api_key", "token", None);
-    /// let response = client.environments().get("production_uid").await?;
+    /// let response = client.environments().get_one("production_uid").await?;
     /// # Ok(())
     /// # }
     /// ```
