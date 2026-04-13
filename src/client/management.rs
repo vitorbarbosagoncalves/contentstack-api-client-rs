@@ -10,8 +10,10 @@ use crate::{
 };
 
 pub mod entries;
+pub mod environments;
 
 use entries::Entries;
+use environments::Environments;
 
 /// Async HTTP client for the Contentstack Content Management API.
 ///
@@ -83,6 +85,26 @@ impl Management {
     /// Returns an [`Entries`] sub-client for managing content entries.
     pub fn entries(&self) -> Entries<'_> {
         Entries {
+            client: &self.client,
+            base_url: &self.config.base_url,
+        }
+    }
+
+    /// Returns an [`Environments`] sub-client for managing environments.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// use contentstack_api_client_rs::Management;
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = Management::new("api_key", "token", None);
+    /// let response = client.environments().get_one("production_uid").await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn environments(&self) -> Environments<'_> {
+        Environments {
             client: &self.client,
             base_url: &self.config.base_url,
         }

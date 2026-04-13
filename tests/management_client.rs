@@ -194,6 +194,51 @@ async fn test_get_many_entries() {
 }
 
 #[tokio::test]
+async fn test_get_environment() {
+    let mock_server = MockServer::start().await;
+
+    let response_body = json!({
+        "environment": {
+            "uid": "env_123",
+            "name": "production",
+            "description": "Production environment",
+            "url": "https://example.com"
+        }
+    });
+
+    Mock::given(method("GET"))
+        .and(path("/environments/env_123"))
+        .and(header("api_key", "test_api_key"))
+        .and(header("authorization", "test_management_token"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
+        .expect(1)
+        .mount(&mock_server)
+        .await;
+
+    let client_opts = ClientOptions {
+        base_url: Some(mock_server.uri()),
+        timeout: Some(Duration::from_secs(1)),
+        max_connections: Some(10),
+        region: None,
+    };
+
+    let client = Management::new("test_api_key", "test_management_token", Some(client_opts));
+
+    let response = client
+        .environments()
+        .get_one("env_123")
+        .await
+        .expect("Failed to fetch environment");
+
+    assert_eq!(response.environment.uid, "env_123");
+    assert_eq!(response.environment.name, "production");
+    assert_eq!(
+        response.environment.description.unwrap(),
+        "Production environment"
+    );
+}
+
+#[tokio::test]
 async fn test_client_cloning() {
     let client = Management::new("test_api_key", "test_management_token", None);
     let cloned_client = client.clone();
