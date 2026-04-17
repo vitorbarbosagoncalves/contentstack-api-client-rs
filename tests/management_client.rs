@@ -29,7 +29,7 @@ async fn test_get_one_entry() {
     });
 
     Mock::given(method("GET"))
-        .and(path("/content_types/blog_post/entries/entry_456"))
+        .and(path("/v3/content_types/blog_post/entries/entry_456"))
         .and(header("api_key", "test_api_key"))
         .and(header("authorization", "test_management_token"))
         .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
@@ -38,7 +38,7 @@ async fn test_get_one_entry() {
         .await;
 
     let client_opts = ClientOptions {
-        base_url: Some(mock_server.uri()),
+        base_url: Some(mock_server.uri() + "/v3"),
         timeout: Some(Duration::from_secs(1)),
         max_connections: Some(10),
         region: None,
@@ -92,7 +92,7 @@ async fn test_get_one_entry_with_publish_details() {
     });
 
     Mock::given(method("GET"))
-        .and(path("/content_types/blog_post/entries/entry_456"))
+        .and(path("/v3/content_types/blog_post/entries/entry_456"))
         .and(wiremock::matchers::query_param(
             "include_publish_details",
             "true",
@@ -102,7 +102,7 @@ async fn test_get_one_entry_with_publish_details() {
         .await;
 
     let client_opts = ClientOptions {
-        base_url: Some(mock_server.uri()),
+        base_url: Some(mock_server.uri() + "/v3"),
         timeout: Some(Duration::from_secs(1)),
         max_connections: Some(10),
         region: None,
@@ -164,7 +164,7 @@ async fn test_get_many_entries() {
     });
 
     Mock::given(method("GET"))
-        .and(path("/content_types/blog_post/entries"))
+        .and(path("/v3/content_types/blog_post/entries"))
         .and(header("api_key", "test_api_key"))
         .and(header("authorization", "test_management_token"))
         .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
@@ -173,7 +173,7 @@ async fn test_get_many_entries() {
         .await;
 
     let client_opts = ClientOptions {
-        base_url: Some(mock_server.uri()),
+        base_url: Some(mock_server.uri() + "/v3"),
         timeout: Some(Duration::from_secs(1)),
         max_connections: Some(10),
         region: None,
@@ -207,7 +207,7 @@ async fn test_get_environment() {
     });
 
     Mock::given(method("GET"))
-        .and(path("/environments/env_123"))
+        .and(path("/v3/environments/env_123"))
         .and(header("api_key", "test_api_key"))
         .and(header("authorization", "test_management_token"))
         .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
@@ -216,7 +216,7 @@ async fn test_get_environment() {
         .await;
 
     let client_opts = ClientOptions {
-        base_url: Some(mock_server.uri()),
+        base_url: Some(mock_server.uri() + "/v3"),
         timeout: Some(Duration::from_secs(1)),
         max_connections: Some(10),
         region: None,
@@ -257,7 +257,7 @@ async fn test_get_many_environments() {
     });
 
     Mock::given(method("GET"))
-        .and(path("/environments"))
+        .and(path("/v3/environments"))
         .and(header("api_key", "test_api_key"))
         .and(header("authorization", "test_management_token"))
         .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
@@ -266,7 +266,7 @@ async fn test_get_many_environments() {
         .await;
 
     let client_opts = ClientOptions {
-        base_url: Some(mock_server.uri()),
+        base_url: Some(mock_server.uri() + "/v3"),
         timeout: Some(Duration::from_secs(1)),
         max_connections: Some(10),
         region: None,
