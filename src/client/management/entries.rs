@@ -5,7 +5,7 @@ use crate::client::entries::{EntriesGetter, EntriesResponse, EntryResponse};
 use crate::client::params::{
     GetManyParams, GetOneParams, SerializedGetManyParams, SerializedGetOneParams,
 };
-use crate::error::Result;
+use crate::error::{Result, handle_response};
 
 /// Sub-client for the Entries endpoint (Management API).
 ///
@@ -40,7 +40,7 @@ impl<'a> EntriesGetter for Entries<'a> {
             request
         };
 
-        Ok(request.send().await?.json::<EntriesResponse<T>>().await?)
+        handle_response(request.send().await?).await
     }
 
     async fn get_one<T: DeserializeOwned>(
@@ -58,6 +58,6 @@ impl<'a> EntriesGetter for Entries<'a> {
             request
         };
 
-        Ok(request.send().await?.json::<EntryResponse<T>>().await?)
+        handle_response(request.send().await?).await
     }
 }

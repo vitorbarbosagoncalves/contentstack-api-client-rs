@@ -1,7 +1,6 @@
 # Roadmap & Planned Work
 
 ## Not Yet Implemented
-- `ClientError` not wired into client methods - they return `reqwest::Error` directly
 - Management API client (`src/client/management/`)
 - Rate limiting - plan: `governor` (GCRA) + `tokio::sync::Semaphore` together
   - `governor` enforces strict req/s; Semaphore caps concurrency - both needed
@@ -33,10 +32,11 @@ feature/* --PR--> main --release-plz--> opens Release PR (Cargo.toml bump + CHAN
 - Required secrets: `CARGO_REGISTRY_TOKEN`, `GITHUB_TOKEN` (auto-provided)
 - Conventional Commits required: `feat:` → minor, `fix:` → patch, `feat!:` → major
 
-## Error Handling Plan
-Expand `ClientError` to cover:
+## Error Handling (completed)
+`ClientError` now covers:
 - `Http(reqwest::Error)` via `#[from]`
-- `RateLimit` (map 429 responses)
-- `Unauthorized` (map 401)
-- `Parse(serde_json::Error)` via `#[from]`
-- Replace all `reqwest::Error` returns in client methods with `crate::error::Result<T>`
+- `Middleware(reqwest_middleware::Error)` via `#[from]`
+- `RateLimit` — mapped from 429 responses
+- `Unauthorized` — mapped from 401 responses
+- `Api { status, body }` — all other non-2xx responses
+- All client methods route through `handle_response<T>` in `src/error.rs`

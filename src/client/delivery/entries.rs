@@ -1,13 +1,12 @@
 use reqwest_middleware::ClientWithMiddleware;
 use serde::de::DeserializeOwned;
 
+pub use crate::client::entries::Entry;
 use crate::client::entries::{EntriesGetter, EntriesResponse, EntryResponse};
 use crate::client::params::{
     GetManyParams, GetOneParams, SerializedGetManyParams, SerializedGetOneParams,
 };
-use crate::error::Result;
-
-pub use crate::client::entries::Entry;
+use crate::error::{Result, handle_response};
 
 /// Sub-client for the Entries endpoint.
 ///
@@ -45,7 +44,7 @@ impl<'a> EntriesGetter for Entries<'a> {
     /// struct BlogPost { body: String }
     ///
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = Delivery::new("api_key", "token", "production", None);
+    /// let client = Delivery::new("api_key", "delivery_token", "production", None);
     /// let response = client.entries()
     ///     .get_many::<BlogPost>("blog_post", None)
     ///     .await?;
@@ -68,7 +67,7 @@ impl<'a> EntriesGetter for Entries<'a> {
             request
         };
 
-        Ok(request.send().await?.json::<EntriesResponse<T>>().await?)
+        handle_response(request.send().await?).await
     }
 
     /// Fetches a single entry by UID for a given content type.
@@ -89,7 +88,7 @@ impl<'a> EntriesGetter for Entries<'a> {
     /// struct BlogPost { body: String }
     ///
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = Delivery::new("api_key", "token", "production", None);
+    /// let client = Delivery::new("api_key", "delivery_token", "production", None);
     /// let response = client.entries()
     ///     .get_one::<BlogPost>("blog_post", "entry_uid_123", None)
     ///     .await?;
@@ -113,6 +112,6 @@ impl<'a> EntriesGetter for Entries<'a> {
             request
         };
 
-        Ok(request.send().await?.json::<EntryResponse<T>>().await?)
+        handle_response(request.send().await?).await
     }
 }

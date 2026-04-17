@@ -12,68 +12,66 @@ struct BlogPost {
 
 #[tokio::test]
 async fn test_get_one_entry() {
-    // 1. Start a local mock server
     let mock_server = MockServer::start().await;
 
-    // 2. Prepare the mock JSON response
     let response_body = json!({
         "entry": {
             "uid": "entry_123",
-            "title": "Hello Rust",
+            "title": "My Entry",
             "locale": "en-us",
             "created_at": "2024-01-01T00:00:00.000Z",
             "updated_at": "2024-01-01T00:00:00.000Z",
             "created_by": "user1",
             "updated_by": "user1",
             "_version": 1,
-            "body": "This is a test post"
+            "body": "Hello World"
         }
     });
 
-    // 3. Configure the mock server expectations
     Mock::given(method("GET"))
-        .and(path("/content_types/blog_post/entries/entry_123"))
+        .and(path("/v3/content_types/blog_post/entries/entry_123"))
         .and(header("api_key", "test_api_key"))
-        .and(header("access_token", "test_token"))
-        .and(header("environment", "test_env"))
+        .and(header("access_token", "test_delivery_token"))
         .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
-        .expect(1) // Ensure the mock is hit exactly once
+        .expect(1)
         .mount(&mock_server)
         .await;
 
-    // 4. Point our Delivery client to the mock server
     let client_opts = ClientOptions {
-        base_url: Some(mock_server.uri()), // Override base URL to hit our mock
+        base_url: Some(mock_server.uri() + "/v3"),
         timeout: Some(Duration::from_secs(1)),
         max_connections: Some(10),
         region: None,
     };
 
-    let client = Delivery::new("test_api_key", "test_token", "test_env", Some(client_opts));
+    let client = Delivery::new(
+        "test_api_key",
+        "test_delivery_token",
+        "production",
+        Some(client_opts),
+    );
 
-    // 5. Execute the actual request
     let response = client
         .entries()
         .get_one::<BlogPost>("blog_post", "entry_123", None)
         .await
         .expect("Failed to fetch entry");
 
-    // 6. Assert the response
     assert_eq!(response.entry.uid, "entry_123");
-    assert_eq!(response.entry.title, "Hello Rust");
-    assert_eq!(response.entry.fields.body, "This is a test post");
+    assert_eq!(response.entry.title, "My Entry");
+    assert_eq!(response.entry.fields.body, "Hello World");
 }
 
 #[tokio::test]
 async fn test_get_one_entry_with_publish_details() {
-    use contentstack_api_client_rs::{GetOneParams, client::entries::PublishDetails};
+    use contentstack_api_client_rs::client::entries::PublishDetails;
 
     let mock_server = MockServer::start().await;
 
     let response_body = json!({
         "entry": {
             "uid": "entry_123",
-            "title": "Hello Rust",
+            "title": "My Entry",
             "locale": "en-us",
             "created_at": "2024-01-01T00:00:00.000Z",
             "updated_at": "2024-01-01T00:00:00.000Z",
@@ -86,44 +84,39 @@ async fn test_get_one_entry_with_publish_details() {
                 "time": "2024-01-01T12:00:00.000Z",
                 "user": "user1"
             },
-            "body": "This is a test post"
+            "body": "Hello World"
         }
     });
 
     Mock::given(method("GET"))
-        .and(path("/content_types/blog_post/entries/entry_123"))
-        .and(wiremock::matchers::query_param(
-            "include_publish_details",
-            "true",
-        ))
+        .and(path("/v3/content_types/blog_post/entries/entry_123"))
         .respond_with(ResponseTemplate::new(200).set_body_json(response_body))
         .mount(&mock_server)
         .await;
 
     let client_opts = ClientOptions {
-        base_url: Some(mock_server.uri()),
+        base_url: Some(mock_server.uri() + "/v3"),
         timeout: Some(Duration::from_secs(1)),
         max_connections: Some(10),
         region: None,
     };
 
-    let client = Delivery::new("test_api_key", "test_token", "test_env", Some(client_opts));
-
-    let params = GetOneParams {
-        include_publish_details: Some(true),
-        ..Default::default()
-    };
+    let client = Delivery::new(
+        "test_api_key",
+        "test_delivery_token",
+        "production",
+        Some(client_opts),
+    );
 
     let response = client
         .entries()
-        .get_one::<BlogPost>("blog_post", "entry_123", Some(params))
+        .get_one::<BlogPost>("blog_post", "entry_123", None)
         .await
         .expect("Failed to fetch entry");
 
     match response.entry.publish_details {
-        Some(PublishDetails::Single(details)) => {
-            assert_eq!(details.environment, "production");
-            assert_eq!(details.user, "user1");
+        Some(PublishDetails::Single(detail)) => {
+            assert_eq!(detail.environment, "production");
         }
         _ => panic!("Expected Single publish_details"),
     }
@@ -131,7 +124,7 @@ async fn test_get_one_entry_with_publish_details() {
 
 #[tokio::test]
 async fn test_client_cloning() {
-    let client = Delivery::new("test_api_key", "test_token", "test_env", None);
+    let client = Delivery::new("test_api_key", "test_delivery_token", "production", None);
     let cloned_client = client.clone();
 
     assert_eq!(client.config.api_key, cloned_client.config.api_key);

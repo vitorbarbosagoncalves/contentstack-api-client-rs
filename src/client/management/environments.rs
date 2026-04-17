@@ -1,6 +1,6 @@
 use crate::client::environments::{EnvironmentResponse, EnvironmentsResponse};
 use crate::client::params::{GetManyParams, SerializedGetManyParams};
-use crate::error::Result;
+use crate::error::{Result, handle_response};
 use reqwest_middleware::ClientWithMiddleware;
 
 /// Sub-client for the Environments endpoint (Management API).
@@ -32,7 +32,7 @@ impl<'a> Environments<'a> {
     /// use contentstack_api_client_rs::Management;
     ///
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = Management::new("my_api_key", "my_token", None);
+    /// let client = Management::new("my_api_key", "my_management_token", None);
     /// let response = client.environments().get_one("production_uid").await?;
     /// println!("Name: {}", response.environment.name);
     /// # Ok(())
@@ -40,7 +40,7 @@ impl<'a> Environments<'a> {
     /// ```
     pub async fn get_one(&self, uid: &str) -> Result<EnvironmentResponse> {
         let request = self.client.get(self.build_url(Some(uid)));
-        Ok(request.send().await?.json::<EnvironmentResponse>().await?)
+        handle_response(request.send().await?).await
     }
 
     /// Fetches a list of all environments available in a stack.
@@ -55,7 +55,7 @@ impl<'a> Environments<'a> {
     /// use contentstack_api_client_rs::{Management, GetManyParams};
     ///
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
-    /// let client = Management::new("my_api_key", "my_token", None);
+    /// let client = Management::new("my_api_key", "my_management_token", None);
     /// let params = GetManyParams {
     ///     include_count: Some(true),
     ///     ..Default::default()
@@ -75,6 +75,6 @@ impl<'a> Environments<'a> {
             request
         };
 
-        Ok(request.send().await?.json::<EnvironmentsResponse>().await?)
+        handle_response(request.send().await?).await
     }
 }

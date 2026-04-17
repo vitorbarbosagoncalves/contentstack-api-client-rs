@@ -25,26 +25,26 @@ impl Region {
     /// Returns the Delivery API (CDN) base URL for the current region.
     pub fn delivery_base_url(&self) -> &'static str {
         match &self {
-            Region::AwsNa => "https://cdn.contentstack.io",
-            Region::AwsEu => "https://eu-cdn.contentstack.com",
-            Region::AwsAu => "https://au-cdn.contentstack.com",
-            Region::AzureNa => "https://azure-na-cdn.contentstack.com",
-            Region::AzureEu => "https://azure-eu-cdn.contentstack.com",
-            Region::GcpNa => "https://gcp-na-cdn.contentstack.com",
-            Region::GcpEu => "https://gcp-eu-cdn.contentstack.com",
+            Region::AwsNa => "https://cdn.contentstack.io/v3",
+            Region::AwsEu => "https://eu-cdn.contentstack.com/v3",
+            Region::AwsAu => "https://au-cdn.contentstack.com/v3",
+            Region::AzureNa => "https://azure-na-cdn.contentstack.com/v3",
+            Region::AzureEu => "https://azure-eu-cdn.contentstack.com/v3",
+            Region::GcpNa => "https://gcp-na-cdn.contentstack.com/v3",
+            Region::GcpEu => "https://gcp-eu-cdn.contentstack.com/v3",
         }
     }
 
     /// Returns the Management API base URL for the current region.
     pub fn management_base_url(&self) -> &'static str {
         match &self {
-            Region::AwsNa => "https://api.contentstack.io",
-            Region::AwsEu => "https://eu-api.contentstack.com",
-            Region::AwsAu => "https://au-api.contentstack.com",
-            Region::AzureNa => "https://azure-na-api.contentstack.com",
-            Region::AzureEu => "https://azure-eu-api.contentstack.com",
-            Region::GcpNa => "https://gcp-na-api.contentstack.com",
-            Region::GcpEu => "https://gcp-eu-api.contentstack.com",
+            Region::AwsNa => "https://api.contentstack.io/v3",
+            Region::AwsEu => "https://eu-api.contentstack.com/v3",
+            Region::AwsAu => "https://au-api.contentstack.com/v3",
+            Region::AzureNa => "https://azure-na-api.contentstack.com/v3",
+            Region::AzureEu => "https://azure-eu-api.contentstack.com/v3",
+            Region::GcpNa => "https://gcp-na-api.contentstack.com/v3",
+            Region::GcpEu => "https://gcp-eu-api.contentstack.com/v3",
         }
     }
 }
@@ -192,7 +192,7 @@ impl ClientConfig {
 
     /// Builds a [`ClientConfig`] for the Management API.
     ///
-    /// Defaults to AWS NA region (`https://api.contentstack.io`) if no
+    /// Defaults to AWS NA region (`https://api.contentstack.io/v3`) if no
     /// `base_url` or `region` override is provided. Management API requests
     /// do not use an environment, so that field is left empty.
     ///
